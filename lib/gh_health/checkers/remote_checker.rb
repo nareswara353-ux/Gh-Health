@@ -1,3 +1,5 @@
+require "shellwords"
+
 module GhHealth
   module Checkers
     class RemoteChecker
@@ -24,7 +26,7 @@ module GhHealth
       attr_reader :repo_path
 
       def list_remotes
-        output = `git -C #{repo_path} remote -v 2>/dev/null`
+        output = `git -C #{Shellwords.escape(repo_path)} remote -v 2>/dev/null`
         output.split("\n").filter_map do |line|
           parts = line.split
           next unless parts.size >= 2

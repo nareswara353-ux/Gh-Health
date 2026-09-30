@@ -1,7 +1,9 @@
+require "shellwords"
+
 module GhHealth
   module Checkers
     class BranchChecker
-      DEFAULT_BRANCH = "main".freeze
+      DEFAULT_BRANCH = "main"
 
       def initialize(repo_path: ".")
         @repo_path = repo_path
@@ -24,7 +26,7 @@ module GhHealth
       attr_reader :repo_path
 
       def current_branch
-        @current_branch ||= `git -C #{repo_path} branch --show-current 2>/dev/null`.strip
+        @current_branch ||= `git -C #{Shellwords.escape(repo_path)} branch --show-current 2>/dev/null`.strip
       end
     end
   end

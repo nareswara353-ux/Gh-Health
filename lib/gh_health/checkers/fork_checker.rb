@@ -1,3 +1,5 @@
+require "shellwords"
+
 module GhHealth
   module Checkers
     class ForkChecker
@@ -22,11 +24,11 @@ module GhHealth
       attr_reader :repo_path
 
       def forked?
-        upstream_url != nil
+        !upstream_url.nil?
       end
 
       def upstream_url
-        output = `git -C #{repo_path} remote -v 2>/dev/null`
+        output = `git -C #{Shellwords.escape(repo_path)} remote -v 2>/dev/null`
         upstream_line = output.split("\n").find { |l| l.start_with?("upstream") }
         upstream_line&.split&.at(1)
       end

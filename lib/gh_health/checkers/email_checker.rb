@@ -1,3 +1,5 @@
+require "shellwords"
+
 module GhHealth
   module Checkers
     class EmailChecker
@@ -9,8 +11,8 @@ module GhHealth
       def call
         return success unless github_email
 
-        if local_email.nil?
-          failure("No git user.email configured")
+        if local_email.nil? || local_email.empty?
+          failure("No git user.email configured for this repo")
         elsif local_email.downcase == github_email.downcase
           success
         else
@@ -23,7 +25,11 @@ module GhHealth
       attr_reader :repo_path, :github_email
 
       def local_email
-        @local_email ||= `git -C #{repo_path} config user.email 2>/dev/null`.strip
+        @local_email ||= run_git("config user.email").strip
+      end
+
+      def run_git(args)
+        `git -C #{Shellwords.escape(repo_path)} #{args} 2>/dev/null`
       end
 
       def success

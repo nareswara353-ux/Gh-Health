@@ -1,4 +1,5 @@
 require "time"
+require "shellwords"
 
 module GhHealth
   module Checkers
@@ -41,7 +42,7 @@ module GhHealth
       end
 
       def log_output
-        @log_output ||= `git -C #{repo_path} log --format="%H|%ct" 2>/dev/null`
+        @log_output ||= `git -C #{Shellwords.escape(repo_path)} log --format="%H|%ct" 2>/dev/null`
       end
     end
   end
