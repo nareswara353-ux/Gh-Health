@@ -1,4 +1,5 @@
 require_relative "gh_health/version"
+require_relative "gh_health/checkers"
 require_relative "gh_health/auditor"
 require_relative "gh_health/report"
 
