@@ -1,0 +1,36 @@
+#!/usr/bin/env ruby
+
+require_relative "../lib/gh_health"
+
+require "optparse"
+
+options = {
+  repo_path: ".",
+  github_email: nil,
+  color: true
+}
+
+OptionParser.new do |opts|
+  opts.banner = "Usage: gh-health [options]"
+  opts.on("-p", "--path PATH", "Path to repo (default: .)") { |v| options[:repo_path] = v }
+  opts.on("-e", "--email EMAIL", "GitHub verified email") { |v| options[:github_email] = v }
+  opts.on("--no-color", "Disable color output") { options[:color] = false }
+  opts.on("-v", "--version", "Show version") do
+    puts "gh-health #{GhHealth::VERSION}"
+    exit
+  end
+  opts.on("-h", "--help", "Show help") do
+    puts opts
+    exit
+  end
+end.parse!
+
+auditor = GhHealth::Auditor.new(
+  repo_path: options[:repo_path],
+  github_email: options[:github_email]
+)
+
+result = auditor.call
+puts GhHealth::Report.new(result).render
+
+exit(result[:failed].zero? ? 0 : 1)
