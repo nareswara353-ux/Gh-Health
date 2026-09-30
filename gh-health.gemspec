@@ -6,7 +6,7 @@ Gem::Specification.new do |spec|
   spec.description = "CLI tool to diagnose and fix common issues that prevent commits from appearing in GitHub contribution graphs"
   spec.homepage = "https://github.com/nareswara353-ux/gh-health"
   spec.license = "MIT"
-  spec.required_ruby_version = ">= 3.0"
+  spec.required_ruby_version = ">= 3.4"
 
   spec.files = Dir["lib/**/*", "bin/*", "README.md", "LICENSE"]
   spec.bindir = "bin"
@@ -14,6 +14,5 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency "erb"
-  spec.add_development_dependency "rspec", "~> 3.13"
-  spec.add_development_dependency "rubocop", "~> 1.60"
+  spec.metadata['rubygems_mfa_required'] = 'true'
 end
