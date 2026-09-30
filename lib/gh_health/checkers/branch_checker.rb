@@ -3,7 +3,7 @@ require "shellwords"
 module GhHealth
   module Checkers
     class BranchChecker
-      DEFAULT_BRANCH = "main"
+      DEFAULT_BRANCH = "main".freeze
 
       def initialize(repo_path: ".")
         @repo_path = repo_path
