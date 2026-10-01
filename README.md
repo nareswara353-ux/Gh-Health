@@ -1,5 +1,7 @@
 # gh-health
 
+[![CI](https://github.com/nareswara353-ux/Gh-Health/actions/workflows/ci.yml/badge.svg)](https://github.com/nareswara353-ux/Gh-Health/actions/workflows/ci.yml)
+
 CLI tool to audit git repositories for common issues that prevent commits from appearing in your GitHub contribution graph.
 
 ## Why
@@ -11,12 +13,16 @@ If you've ever pushed dozens of commits and still see **0 contributions**, `gh-h
 - ❌ **Not a GitHub remote** — origin points somewhere else
 - ❌ **Wrong branch** — you're on a non-default branch
 - ❌ **Fork repo** — GitHub ignores contribution to forks
+- ℹ️ **Private repo reminder** — ensure "Include private contributions" is enabled
+- ℹ️ **Activity summary** — total commits and active days in last 30 days
+- ℹ️ **README presence** — GitHub profile shows project description only with a README
 
 ## Installation
 
 ```bash
-git clone https://github.com/nareswara353-ux/gh-health.git
+git clone https://github.com/nareswara353-ux/Gh-Health.git
 cd gh-health
+bundle install
 chmod +x bin/gh-health
 Usage
 bash
@@ -25,6 +31,12 @@ bin/gh-health
 
 # Audit a specific repo with GitHub email check
 bin/gh-health -p ~/my-project -e you@example.com
+
+# JSON output (for CI integration)
+bin/gh-health --json
+
+# Show version
+bin/gh-health --version
 Example output
 text
 === gh-health audit: /home/user/my-project ===
@@ -33,42 +45,55 @@ text
 ✅ [DateChecker] No future-dated commits detected
 ✅ [RemoteChecker] Origin points to GitHub: git@github.com:user/repo.git
 ✅ [BranchChecker] On default branch (main)
-❌ [ForkChecker] Repository is a fork — GitHub does not count fork contributions
-   → {upstream: "https://github.com/original/repo.git"}
+✅ [ForkChecker] Repository is not a fork
+✅ [VisibilityChecker] Repository visibility must be checked on GitHub
+✅ [CommitCountChecker] 24 commits across 6 active day(s) in last 30 days
+✅ [ReadmeChecker] README found: README.md
 
-4/5 passed, 1 failed
+8/8 passed, 0 failed
+JSON output
+json
+{
+  "repo_path": ".",
+  "passed": 8,
+  "failed": 0,
+  "results": [
+    { "ok": true, "message": "Email matches GitHub account", "checker": "EmailChecker" }
+  ]
+}
+Checkers
+Checker	Purpose
+EmailChecker	Verifies git email = GitHub verified email
+DateChecker	Detects future-dated commits (system clock skew)
+RemoteChecker	Ensures origin points to github.com
+BranchChecker	Ensures current branch is main
+ForkChecker	Detects fork repositories (excluded from contributions)
+VisibilityChecker	Reminds to enable private contributions
+CommitCountChecker	Shows commits and active days in last 30 days
+ReadmeChecker	Verifies README presence for profile display
 Exit Codes
 0 — all checks passed
 
 1 — one or more checks failed
 
+Roadmap
+☑ Core checkers (email, date, remote, branch, fork)
+☑ Additional checkers (visibility, commit count, readme)
+☑ JSON output format
+□ Publish to RubyGems
+□ GitHub API integration (verified email auto-detection)
+□ --fix flag for auto-remediation
+□ GitLab support
+□ Homebrew formula
 Development
 bash
 bundle install
 bundle exec rspec
+bundle exec rubocop
+See CONTRIBUTING.md for adding new checkers.
+
 License
-MIT
-EOF
+MIT — see LICENSE.
 
-cat << 'EOF' > LICENSE
-MIT License
-
-Copyright (c) 2026 Narezzzs
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+Changelog
+See CHANGELOG.md.
