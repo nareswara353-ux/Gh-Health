@@ -1,20 +1,19 @@
 #!/usr/bin/env ruby
 
 require_relative "../lib/gh_health"
-
 require "optparse"
 
 options = {
   repo_path: ".",
   github_email: nil,
-  color: true
+  format: :text
 }
 
 OptionParser.new do |opts|
   opts.banner = "Usage: gh-health [options]"
   opts.on("-p", "--path PATH", "Path to repo (default: .)") { |v| options[:repo_path] = v }
   opts.on("-e", "--email EMAIL", "GitHub verified email") { |v| options[:github_email] = v }
-  opts.on("--no-color", "Disable color output") { options[:color] = false }
+  opts.on("--json", "Output as JSON") { options[:format] = :json }
   opts.on("-v", "--version", "Show version") do
     puts "gh-health #{GhHealth::VERSION}"
     exit
@@ -31,6 +30,6 @@ auditor = GhHealth::Auditor.new(
 )
 
 result = auditor.call
-puts GhHealth::Report.new(result).render
+puts GhHealth::Report.new(result, format: options[:format]).render
 
 exit(result[:failed].zero? ? 0 : 1)
