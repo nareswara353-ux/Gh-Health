@@ -1,41 +1,59 @@
+require "json"
+
 module GhHealth
   class Report
     ICONS = { ok: "✅", fail: "❌" }.freeze
 
-    def initialize(audit_result, color: true)
+    def initialize(audit_result, format: :text)
       @result = audit_result
-      @color = color
+      @format = format
     end
 
     def render
+      case format
+      when :json then render_json
+      else render_text
+      end
+    end
+
+    private
+
+    attr_reader :result, :format
+
+    def render_text
       lines = []
       lines << header
       lines << ""
-      @result[:results].each { |r| lines << format_result(r) }
+      result[:results].each { |r| lines << format_result(r) }
       lines << ""
       lines << summary
       lines.join("\n")
     end
 
-    private
-
-    def header
-      "=== gh-health audit: #{@result[:repo_path]} ==="
+    def render_json
+      JSON.pretty_generate(
+        repo_path: result[:repo_path],
+        passed: result[:passed],
+        failed: result[:failed],
+        results: result[:results]
+      )
     end
 
-    def format_result(result)
-      icon = result[:ok] ? ICONS[:ok] : ICONS[:fail]
-      line = "#{icon} [#{result[:checker]}] #{result[:message]}"
-      return line unless result[:details]
+    def header
+      "=== gh-health audit: #{result[:repo_path]} ==="
+    end
 
-      "#{line}\n   → #{result[:details].inspect}"
+    def format_result(r)
+      icon = r[:ok] ? ICONS[:ok] : ICONS[:fail]
+      line = "#{icon} [#{r[:checker]}] #{r[:message]}"
+      return line unless r[:details]
+
+      "#{line}\n   → #{r[:details].inspect}"
     end
 
     def summary
-      total = @result[:results].size
-      passed = @result[:passed]
-      failed = @result[:failed]
-      "#{passed}/#{total} passed, #{failed} failed"
+      total = result[:results].size
+      "#{result[:passed]}/#{total} passed, #{result[:failed]} failed"
     end
   end
 end
