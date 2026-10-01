@@ -4,9 +4,7 @@ module GhHealth
   module Checkers
     class VisibilityChecker < Base
       def call
-        if remote_url.empty?
-          return failure("No origin remote to determine visibility")
-        end
+        return failure("No origin remote to determine visibility") if remote_url.empty?
 
         success(
           "Repository visibility must be checked on GitHub — enable 'Include private contributions' if private",

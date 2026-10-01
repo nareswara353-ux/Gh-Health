@@ -6,7 +6,7 @@ RSpec.describe GhHealth::Checkers::CommitCountChecker do
 
   it "counts commits and active days" do
     output = "abc|2026-09-28\ndef|2026-09-28\nghi|2026-09-29\n"
-    allow(checker).to receive(:`).and_return(output)
+    allow(checker).to receive(:run_git).and_return(output)
     result = checker.call
     expect(result[:ok]).to be true
     expect(result[:details][:total_commits]).to eq(3)
@@ -14,8 +14,9 @@ RSpec.describe GhHealth::Checkers::CommitCountChecker do
   end
 
   it "handles empty log" do
-    allow(checker).to receive(:`).and_return("")
+    allow(checker).to receive(:run_git).and_return("")
     result = checker.call
     expect(result[:details][:total_commits]).to eq(0)
+    expect(result[:details][:active_days]).to eq(0)
   end
 end

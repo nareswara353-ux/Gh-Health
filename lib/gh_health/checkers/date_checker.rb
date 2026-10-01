@@ -1,36 +1,29 @@
+require_relative "base"
 require "time"
-require "shellwords"
 
 module GhHealth
   module Checkers
-    class DateChecker
+    class DateChecker < Base
       FUTURE_THRESHOLD_SECONDS = 300
-
-      def initialize(repo_path: ".")
-        @repo_path = repo_path
-      end
 
       def call
         future_commits = detect_future_commits
 
         if future_commits.empty?
-          { ok: true, message: "No future-dated commits detected" }
+          success("No future-dated commits detected")
         else
-          {
-            ok: false,
-            message: "#{future_commits.size} future-dated commit(s) found",
-            details: future_commits
-          }
+          failure(
+            "#{future_commits.size} future-dated commit(s) found",
+            future_commits
+          )
         end
       end
 
       private
 
-      attr_reader :repo_path
-
       def detect_future_commits
         now = Time.now.to_i
-        log_output.split("\n").filter_map do |line|
+        run_git('log --format="%H|%ct"').split("\n").filter_map do |line|
           sha, timestamp = line.split("|")
           next if timestamp.nil?
 
@@ -39,10 +32,6 @@ module GhHealth
 
           { sha: sha.strip, date: Time.at(commit_time).iso8601 }
         end
-      end
-
-      def log_output
-        @log_output ||= `git -C #{Shellwords.escape(repo_path)} log --format="%H|%ct" 2>/dev/null`
       end
     end
   end

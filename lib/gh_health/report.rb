@@ -43,12 +43,12 @@ module GhHealth
       "=== gh-health audit: #{result[:repo_path]} ==="
     end
 
-    def format_result(r)
-      icon = r[:ok] ? ICONS[:ok] : ICONS[:fail]
-      line = "#{icon} [#{r[:checker]}] #{r[:message]}"
-      return line unless r[:details]
+    def format_result(result)
+      icon = result[:ok] ? ICONS[:ok] : ICONS[:fail]
+      line = "#{icon} [#{result[:checker]}] #{result[:message]}"
+      return line unless result[:details]
 
-      "#{line}\n   → #{r[:details].inspect}"
+      "#{line}\n   → #{result[:details].inspect}"
     end
 
     def summary
