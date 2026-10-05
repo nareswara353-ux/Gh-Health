@@ -5,4 +5,5 @@
 *.gem
 .DS_Store
 /vendor/bundle
-/.bundle
+/.env
+node_modules/

@@ -32,11 +32,17 @@ module GhHealth
       end
 
       def ignored?(pattern)
-        File.readlines(File.join(repo_path, ".gitignore"))
-            .map(&:strip)
-            .any? { |line| line == pattern || line.end_with?("/#{pattern}") }
+        normalized_pattern = pattern.chomp("/")
+        lines.any? do |line|
+          normalized_line = line.chomp("/")
+          normalized_line == normalized_pattern || normalized_line.end_with?("/#{normalized_pattern}")
+        end
       rescue StandardError
         false
+      end
+
+      def lines
+        File.readlines(File.join(repo_path, ".gitignore")).map(&:strip).reject(&:empty?)
       end
     end
   end
