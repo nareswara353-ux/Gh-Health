@@ -7,6 +7,8 @@ require_relative "checkers/fork_checker"
 require_relative "checkers/visibility_checker"
 require_relative "checkers/commit_count_checker"
 require_relative "checkers/readme_checker"
+require_relative "checkers/license_checker"
+require_relative "checkers/gitignore_checker"
 
 module GhHealth
   module Checkers
@@ -18,7 +20,9 @@ module GhHealth
       ForkChecker,
       VisibilityChecker,
       CommitCountChecker,
-      ReadmeChecker
+      ReadmeChecker,
+      LicenseChecker,
+      GitignoreChecker
     ].freeze
   end
 end
