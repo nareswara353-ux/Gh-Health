@@ -6,13 +6,15 @@ require "optparse"
 options = {
   repo_path: ".",
   github_email: nil,
-  format: :text
+  format: :text,
+  save_email: false
 }
 
 OptionParser.new do |opts|
   opts.banner = "Usage: gh-health [options]"
   opts.on("-p", "--path PATH", "Path to repo (default: .)") { |v| options[:repo_path] = v }
   opts.on("-e", "--email EMAIL", "GitHub verified email") { |v| options[:github_email] = v }
+  opts.on("--save-email", "Persist email to ~/.config/gh-health/config.yml") { options[:save_email] = true }
   opts.on("--json", "Output as JSON") { options[:format] = :json }
   opts.on("-v", "--version", "Show version") do
     puts "gh-health #{GhHealth::VERSION}"
@@ -24,9 +26,22 @@ OptionParser.new do |opts|
   end
 end.parse!
 
+config = GhHealth::Config.new
+
+if options[:save_email]
+  if options[:github_email].nil?
+    warn "Error: --save-email requires --email"
+    exit 2
+  end
+  config.github_email = options[:github_email]
+  puts "Saved email: #{options[:github_email]}"
+end
+
+github_email = options[:github_email] || config.github_email
+
 auditor = GhHealth::Auditor.new(
   repo_path: options[:repo_path],
-  github_email: options[:github_email]
+  github_email: github_email
 )
 
 result = auditor.call
