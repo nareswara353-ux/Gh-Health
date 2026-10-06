@@ -38,7 +38,7 @@ module GhHealth
     def load
       return {} unless File.exist?(path)
 
-      YAML.safe_load(File.read(path)) || {}
+      YAML.safe_load_file(path) || {}
     rescue StandardError
       {}
     end
