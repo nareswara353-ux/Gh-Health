@@ -16,6 +16,10 @@ OptionParser.new do |opts|
   opts.on("-e", "--email EMAIL", "GitHub verified email") { |v| options[:github_email] = v }
   opts.on("--save-email", "Persist email to ~/.config/gh-health/config.yml") { options[:save_email] = true }
   opts.on("--json", "Output as JSON") { options[:format] = :json }
+  opts.on("-l", "--list", "List all available checkers") do
+    GhHealth::Checkers::ALL.each { |c| puts c.name.split("::").last }
+    exit
+  end
   opts.on("-v", "--version", "Show version") do
     puts "gh-health #{GhHealth::VERSION}"
     exit
