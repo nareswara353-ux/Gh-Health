@@ -1,3 +1,5 @@
+require_relative "fixers/email_fixer"
+
 module GhHealth
   class Fixer
     def initialize(result:, repo_path: ".", github_email: nil)
@@ -25,18 +27,13 @@ module GhHealth
 
     def fix_for(checker)
       case checker
-      when "EmailChecker" then fix_email
+      when "EmailChecker" then email_fixer.call
       else { ok: false, checker: checker, message: "No auto-fix available" }
       end
     end
 
-    def fix_email
-      return { ok: false, checker: "EmailChecker", message: "No GitHub email provided" } if github_email.nil?
-
-      system("git", "-C", repo_path, "config", "user.email", github_email, out: File::NULL, err: File::NULL)
-      { ok: true, checker: "EmailChecker", message: "Set git email to #{github_email}" }
-    rescue StandardError => e
-      { ok: false, checker: "EmailChecker", message: e.message }
+    def email_fixer
+      Fixers::EmailFixer.new(repo_path: repo_path, github_email: github_email)
     end
   end
 end
