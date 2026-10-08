@@ -6,14 +6,18 @@ require "optparse"
 options = {
   repo_path: ".",
   github_email: nil,
+  github_username: nil,
   format: :text,
-  save_email: false
+  save_email: false,
+  auto_detect: false
 }
 
 OptionParser.new do |opts|
   opts.banner = "Usage: gh-health [options]"
   opts.on("-p", "--path PATH", "Path to repo (default: .)") { |v| options[:repo_path] = v }
   opts.on("-e", "--email EMAIL", "GitHub verified email") { |v| options[:github_email] = v }
+  opts.on("-u", "--username USER", "GitHub username (for --auto-detect-email)") { |v| options[:github_username] = v }
+  opts.on("--auto-detect-email", "Fetch verified email from GitHub API") { options[:auto_detect] = true }
   opts.on("--save-email", "Persist email to ~/.config/gh-health/config.yml") { options[:save_email] = true }
   opts.on("--json", "Output as JSON") { options[:format] = :json }
   opts.on("-l", "--list", "List all available checkers") do
@@ -31,6 +35,20 @@ OptionParser.new do |opts|
 end.parse!
 
 config = GhHealth::Config.new
+
+if options[:auto_detect]
+  if options[:github_username].nil?
+    warn "Error: --auto-detect-email requires --username"
+    exit 2
+  end
+  detected = GhHealth::VerifiedEmailFetcher.new(username: options[:github_username]).call
+  if detected
+    options[:github_email] = detected
+    puts "Auto-detected email: #{detected}"
+  else
+    warn "Warning: Could not auto-detect email — falling back to config/args"
+  end
+end
 
 if options[:save_email]
   if options[:github_email].nil?
