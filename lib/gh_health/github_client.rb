@@ -4,10 +4,10 @@ require "uri"
 
 module GhHealth
   class GitHubClient
-    API_BASE = "https://api.github.com"
+    API_BASE = "https://api.github.com".freeze
 
     def initialize(token: nil)
-      @token = token || ENV["GITHUB_TOKEN"]
+      @token = token || ENV.fetch("GITHUB_TOKEN", nil)
     end
 
     def verified_emails(username)
