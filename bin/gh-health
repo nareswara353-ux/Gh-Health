@@ -10,7 +10,8 @@ options = {
   format: :text,
   save_email: false,
   auto_detect: false,
-  fix: false
+  fix: false,
+  batch: false
 }
 
 OptionParser.new do |opts|
@@ -20,6 +21,7 @@ OptionParser.new do |opts|
   opts.on("-u", "--username USER", "GitHub username (for --auto-detect-email)") { |v| options[:github_username] = v }
   opts.on("--auto-detect-email", "Fetch verified email from GitHub API") { options[:auto_detect] = true }
   opts.on("--save-email", "Persist email to ~/.config/gh-health/config.yml") { options[:save_email] = true }
+  opts.on("--batch", "Audit all git repos in --path directory") { options[:batch] = true }
   opts.on("--fix", "Attempt to auto-fix failed checks") { options[:fix] = true }
   opts.on("--json", "Output as JSON") { options[:format] = :json }
   opts.on("-l", "--list", "List all available checkers") do
@@ -62,6 +64,16 @@ if options[:save_email]
 end
 
 github_email = options[:github_email] || config.github_email
+
+if options[:batch]
+  batch = GhHealth::BatchAuditor.new(
+    base_path: options[:repo_path],
+    github_email: github_email
+  )
+  batch_result = batch.call
+  puts GhHealth::BatchReport.new(batch_result, format: options[:format]).render
+  exit(batch_result[:failed].zero? ? 0 : 1)
+end
 
 auditor = GhHealth::Auditor.new(
   repo_path: options[:repo_path],
