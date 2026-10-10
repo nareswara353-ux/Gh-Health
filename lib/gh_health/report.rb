@@ -60,6 +60,7 @@ module GhHealth
       "#{result[:passed]}/#{total} passed, #{result[:failed]} failed"
     end
   end
+
   class BatchReport
     ICONS = { ok: "✅", fail: "❌" }.freeze
 

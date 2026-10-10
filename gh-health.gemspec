@@ -1,6 +1,6 @@
 Gem::Specification.new do |spec|
   spec.name = "gh-health"
-  spec.version = "0.5.0"
+  spec.version = "0.6.0"
   spec.authors = ["Narezzzs"]
   spec.summary = "Audit git repositories for GitHub contribution graph issues"
   spec.description = "CLI tool to diagnose and fix common issues that prevent commits from appearing in GitHub contribution graphs"
