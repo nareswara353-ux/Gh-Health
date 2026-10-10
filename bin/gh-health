@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby
 
 require_relative "../lib/gh_health"
+require_relative "../lib/gh_health/batch_fixer"
 require "optparse"
 
 options = {
@@ -72,6 +73,19 @@ if options[:batch]
   )
   batch_result = batch.call
   puts GhHealth::BatchReport.new(batch_result, format: options[:format]).render
+
+  if options[:fix] && batch_result[:failed].positive?
+    puts "\n=== Batch auto-fix ==="
+    fix_result = GhHealth::BatchFixer.new(
+      batch_result: batch_result,
+      github_email: github_email
+    ).call
+    fix_result[:details].each do |r|
+      puts "#{r[:repo_path]} — #{r[:applied]} fix(es) applied, #{r[:skipped]} skipped"
+    end
+    puts "\nTotal: #{fix_result[:total]} repos | #{fix_result[:fixed]} fixed"
+  end
+
   exit(batch_result[:failed].zero? ? 0 : 1)
 end
 
