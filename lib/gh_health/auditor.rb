@@ -1,3 +1,4 @@
+require_relative "checkers"
 module GhHealth
   class Auditor
     def initialize(repo_path: ".", github_email: nil)
