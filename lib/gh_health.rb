@@ -5,6 +5,7 @@ require_relative "gh_health/verified_email_fetcher"
 require_relative "gh_health/checkers"
 require_relative "gh_health/auditor"
 require_relative "gh_health/fixer"
+require_relative "gh_health/batch_auditor"
 require_relative "gh_health/report"
 
 module GhHealth
