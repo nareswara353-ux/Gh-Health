@@ -5,6 +5,7 @@ AllCops:
   Exclude:
     - "vendor/**/*"
     - "bin/**/*"
+    - "scripts/**/*"
     - "spec/spec_helper.rb"
 
 Style/Documentation:
