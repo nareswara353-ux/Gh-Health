@@ -18,8 +18,16 @@ jobs:
         with:
           ruby-version: ${{ matrix.ruby-version }}
           bundler-cache: true
-      - name: Run RSpec
+      - name: Run RSpec with coverage
         run: bundle exec rspec
+      - name: Generate coverage badge
+        run: ruby scripts/coverage_badge.rb
+      - name: Upload coverage report
+        if: matrix.ruby-version == '3.4'
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage/
 
   lint:
     runs-on: ubuntu-latest
